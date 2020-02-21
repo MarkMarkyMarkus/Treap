@@ -5,7 +5,7 @@ defmodule Heap do
   end
 
   @doc """
-  Creates and inserts a node with its value into the heap.
+  Creates and inserts a node into the heap.
   """
   @spec insert(%{} | :leaf, any) :: %{}
 
@@ -49,8 +49,8 @@ defmodule Heap do
   end
 
   defp del(%{value: _, size: _, left: :leaf, right: right}), do: right
-  defp del(%{value: _, size: _, left: left, right: :leaf}),   do: left
-  defp del(%{value: _, size: s, left: left, right: right}) do
+  defp del(%{value: _, size: _, left: left, right: :leaf}),  do: left
+  defp del(%{value: _, size: s, left: left, right: right})   do
     %{value: min(right), size: s - 1, left: left, right: delete(right, min(right))}
   end
 
@@ -58,7 +58,7 @@ defmodule Heap do
   defp size(%{value: _, size: size, left: _, right: _}), do: size
 
   defp min(%{value: val, size: _, left: :leaf, right: _}), do: val
-  defp min(%{value: _, size: _, left: left, right: _}), do: min left
+  defp min(%{value: _, size: _, left: left, right: _}),    do: min left
 end
 
 val1 = Heap.new_heap(3)

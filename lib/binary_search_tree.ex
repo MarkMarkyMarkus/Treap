@@ -43,12 +43,12 @@ defmodule BinarySearchTree do
 
   defp del(%{left: :leaf,  value: _, right: right}), do: right
   defp del(%{left: left, value: _, right: :leaf}),   do: left
-  defp del(%{left: left, value: _, right: right}) do
+  defp del(%{left: left, value: _, right: right})    do
     %{left: left, value: min(right), right: delete(right, min(right))}
   end
 
   defp min(%{left: :leaf,  value: val, right: _}), do: val
-  defp min(%{left: left, value: _,   right: _}), do: min left
+  defp min(%{left: left, value: _,   right: _}),   do: min left
 end
 
 val1 = BinarySearchTree.new_tree(3)
