@@ -1,0 +1,21 @@
+language: elixir
+
+sudo: false
+
+stages:
+  - test
+
+env:
+  global:
+    - MIX_ENV=test
+
+cache:
+  directories:
+    - deps
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - mix deps.get
+        - mix test

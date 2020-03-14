@@ -5,7 +5,7 @@ defmodule BinarySearchTree do
   end
 
   @doc """
-  Creates and inserts a node with its value into the tree.
+  Create and inserts a node with its value into the tree.
   """
   @spec insert(%{} | :leaf, any) :: %{}
 
@@ -19,14 +19,15 @@ defmodule BinarySearchTree do
   end
 
   @doc """
-  Removes a node from the given tree.
+  Remove a node from the given tree.
   """
-  @spec delete_node(%{}, any) :: %{} | nil
+  @spec delete_node(%{}, any) :: %{}
 
   def delete_node(tree, node_value) do
       delete tree, node_value
   end
 
+  defp delete(:leaf, _), do: :leaf
   defp delete(tree, node_value) do
     cond do
       tree.value == node_value -> del(tree)
@@ -49,10 +50,49 @@ defmodule BinarySearchTree do
 
   defp min(%{left: :leaf,  value: val, right: _}), do: val
   defp min(%{left: left, value: _,   right: _}),   do: min left
-end
 
-val1 = BinarySearchTree.new_tree(3)
-r1 = BinarySearchTree.insert(val1, 5)
-r2 = BinarySearchTree.insert(r1, 10)
-r3 = BinarySearchTree.insert(r2, 1)
-IO.inspect(r3)
+  @doc """
+  Create BST from the list.
+  """
+  @spec from_list(list()) :: %{} | nil
+
+  def from_list([]), do: nil
+  def from_list([h | tail]) do
+    List.foldl(tail, new_tree(h), fn e, acc -> insert(acc, e) end)
+  end
+
+  @doc """
+  Get the size of the BST.
+  """
+  @spec size(%{}) :: integer
+
+  def size(bst), do: size_counter(bst, 0)
+
+  defp size_counter(:leaf, acc), do: acc
+  defp size_counter(%{left: left, value: _, right: right}, acc), do: acc + 1 + size_counter(left, acc) + size_counter(right, acc)
+
+  @doc """
+  Create list from the BST.
+  """
+  @spec to_list(%{}) :: list()
+
+  def to_list(bst), do: to_list_helper(bst, [])
+
+  defp to_list_helper(:leaf, acc), do: acc
+  defp to_list_helper(%{left: left, value: v, right: right}, acc),
+       do: Enum.concat([acc, [v], to_list_helper(left, acc), to_list_helper(right, acc)])
+
+  @doc """
+  Search a node in the given BST.
+  """
+  @spec search(%{}, any) :: %{} | nil
+
+  def search(:leaf, _), do: nil
+  def search(%{left: left, value: v, right: right}, value) do
+    cond do
+      v == value -> %{left: left, value: v, right: right}
+      value < v  -> search(left, value)
+      value > v  -> search(right, value)
+    end
+  end
+end

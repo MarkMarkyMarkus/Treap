@@ -1,11 +1,11 @@
 defmodule Heap do
-  @moduledoc "My first heap in Elixir !!!"
+  @moduledoc "My first max heap in Elixir !!!"
   def new_heap(value) do
     %{value: value, size: 1, left: :leaf, right: :leaf}
   end
 
   @doc """
-  Creates and inserts a node into the heap.
+  Create and insert a node into the heap.
   """
   @spec insert(%{} | :leaf, any) :: %{}
 
@@ -16,15 +16,15 @@ defmodule Heap do
       %{value: value, size: size + 1, left: left, right: insert(right, node_value)}
     node_value < value ->
       %{value: value, size: size + 1, left: insert(left, node_value), right: right}
-    node_value > value and size(left) > size(right) ->
+    node_value >= value and size(left) > size(right) ->
       %{value: node_value, size: size + 1, left: left, right: insert(right, value)}
-    node_value > value ->
+    node_value >= value ->
       %{value: node_value, size: size + 1, left: insert(left, value), right: right}
       end
     end
 
   @doc """
-  Removes a node from the given heap.
+  Remove a node from the given heap.
   """
   @spec delete_node(%{}, any) :: %{} | nil
 
@@ -32,19 +32,19 @@ defmodule Heap do
     delete heap, node_value
   end
 
+  defp delete(nil, _), do: nil
+  defp delete(:leaf, _), do: :leaf
   defp delete(heap, node_value) do
     cond do
       heap.value == node_value -> del(heap)
-      heap.value <  node_value ->
+      heap.value > node_value  ->
         %{value: heap.value,
-          size: heap.size,
-          left: heap.left,
-          right: delete(heap.right, node_value)}
-      heap.value > node_value ->
-        %{value: heap.value,
-          size: heap.size,
-          left: delete(heap.left,node_value),
-          right: heap.right}
+          size: heap.size - 1,
+          left: delete(heap.left, node_value),
+          right: delete(heap.right, node_value)
+        }
+      heap.value < node_value  ->
+        heap
     end
   end
 
@@ -59,10 +59,32 @@ defmodule Heap do
 
   defp min(%{value: val, size: _, left: :leaf, right: _}), do: val
   defp min(%{value: _, size: _, left: left, right: _}),    do: min left
-end
 
-val1 = Heap.new_heap(3)
-r1 = Heap.insert(val1, 5)
-r2 = Heap.insert(r1, 10)
-r3 = Heap.insert(r2, 1)
-IO.inspect(r3)
+  @doc """
+  Create a heap from the list.
+  """
+  @spec from_list(list()) :: %{} | nil
+
+  def from_list([]), do: nil
+  def from_list([h | tail]) do
+    List.foldl(tail, new_heap(h), fn e, acc -> insert(acc, e) end)
+  end
+
+  @doc """
+  Create list from the heap.
+  """
+  @spec to_list(%{}) :: list()
+
+  def to_list(heap), do: to_list_helper(heap, [])
+
+  defp to_list_helper(:leaf, acc), do: acc
+  defp to_list_helper(%{left: left, value: v, right: right}, acc),
+       do: Enum.concat([acc, [v], to_list_helper(left, acc), to_list_helper(right, acc)])
+
+  @doc """
+  Get max element from the heap.
+  """
+  @spec get_max(%{}) :: any
+
+  def get_max(%{value: val, size: _, left: _, right: _}), do: val
+end
